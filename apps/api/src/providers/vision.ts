@@ -131,6 +131,111 @@ const openAiCompatible: VisionProvider = {
   },
 };
 
+const GEMINI_SCHEMA = {
+  type: "object",
+  properties: {
+    imageQuality: {
+      type: "object",
+      properties: {
+        acceptable: { type: "boolean" },
+        reasons: { type: "array", items: { type: "string" } },
+      },
+      required: ["acceptable", "reasons"],
+    },
+    metrics: {
+      type: "object",
+      properties: {
+        hydration: { type: "integer" },
+        oiliness: { type: "integer" },
+        texture: { type: "integer" },
+        pores: { type: "integer" },
+        acne: { type: "integer" },
+        redness: { type: "integer" },
+      },
+      required: ["hydration", "oiliness", "texture", "pores", "acne", "redness"],
+    },
+    skinProfile: { type: "string" },
+    findings: { type: "array", items: { type: "string" } },
+    sensitivityTags: { type: "array", items: { type: "string" } },
+    limitations: { type: "array", items: { type: "string" } },
+  },
+  required: ["imageQuality", "metrics", "skinProfile", "findings", "sensitivityTags", "limitations"],
+};
+
+/**
+ * Google AI Studio (Gemini) vision provider. Returns raw provider text as JSON; the caller
+ * validates the shape, and a malformed answer is a 502 rather than a downgraded score.
+ */
+export const geminiProvider: VisionProvider = {
+  id: "gemini",
+  model: config.vision.model,
+  async analyzeSkin({ image, mime }: VisionInput) {
+    if (!config.vision.apiKey) {
+      throw Object.assign(new Error("GEMINI_API_KEY belum diset"), { code: "PROVIDER_UNAVAILABLE" });
+    }
+    const model = config.vision.model.replace(/^models\//, "");
+    const url = `${config.vision.baseUrl.replace(/\/$/, "")}/models/${model}:generateContent?key=${encodeURIComponent(config.vision.apiKey)}`;
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), config.vision.timeoutMs);
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        signal: controller.signal,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: METRIC_PROMPT }] },
+          contents: [
+            {
+              role: "user",
+              parts: [
+                { text: "Analisis gambar wajah ini." },
+                { inline_data: { mime_type: mime, data: image.toString("base64") } },
+              ],
+            },
+          ],
+          generationConfig: {
+            temperature: 0.2,
+            responseMimeType: "application/json",
+            responseSchema: GEMINI_SCHEMA,
+          },
+        }),
+      });
+
+      if (!response.ok) {
+        const retryable = response.status === 429 || response.status >= 500;
+        throw Object.assign(new Error(`Gemini HTTP ${response.status}`), {
+          code: retryable ? "PROVIDER_UNAVAILABLE" : "INVALID_PROVIDER_OUTPUT",
+        });
+      }
+
+      const body = (await response.json()) as {
+        candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
+      };
+      const text = (body.candidates?.[0]?.content?.parts ?? [])
+        .map((p) => p.text ?? "")
+        .join("")
+        .trim();
+      if (!text) {
+        throw Object.assign(new Error("Gemini mengembalikan jawaban kosong"), { code: "INVALID_PROVIDER_OUTPUT" });
+      }
+      try {
+        return JSON.parse(text);
+      } catch {
+        // A non-JSON answer is a provider fault, never a reason to invent numbers.
+        throw Object.assign(new Error("Jawaban provider bukan JSON"), { code: "INVALID_PROVIDER_OUTPUT" });
+      }
+    } catch (error) {
+      if ((error as Error).name === "AbortError") {
+        throw Object.assign(new Error("Vision provider timed out"), { code: "PROVIDER_UNAVAILABLE" });
+      }
+      throw error;
+    } finally {
+      clearTimeout(timer);
+    }
+  },
+};
+
 export function getVisionProvider(): VisionProvider {
+  if (config.vision.provider === "gemini") return geminiProvider;
   return config.vision.provider === "openai-compatible" ? openAiCompatible : stubProvider;
 }

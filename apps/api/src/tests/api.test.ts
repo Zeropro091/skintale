@@ -262,3 +262,76 @@ describe("deletion", () => {
     expect(gone.status).toBe(404);
   });
 });
+
+describe("regressions from the UI build", () => {
+  it("serves the test console at /", async () => {
+    const r = await agent.get("/");
+    expect(r.status).toBe(200);
+    expect(r.text).toContain("FaceWish");
+    expect(r.headers["content-type"]).toContain("text/html");
+  });
+
+  it("lists scans as an array (get() vs all() regression)", async () => {
+    await agent.post("/api/analyze-skin")
+      .attach("image", minimalPng(600, 600), { filename: "face.png", contentType: "image/png" });
+
+    const r = await agent.get("/api/scans?limit=10");
+    expect(r.status).toBe(200);
+    expect(Array.isArray(r.body.items)).toBe(true);
+    expect(r.body.items.length).toBeGreaterThan(0);
+    expect(r.body.items[0]).toHaveProperty("scanId");
+    expect(r.body.items[0]).toHaveProperty("status");
+  });
+
+  it("answers the session probe without 401 when anonymous", async () => {
+    const fresh = supertest.agent(app);
+    const anon = await fresh.get("/api/auth/session");
+    expect(anon.status).toBe(200);
+    expect(anon.body.user).toBeNull();
+
+    await fresh.post("/api/auth/register").send({ email: "session@test.dev", password: "supersecret9" });
+    const signedIn = await fresh.get("/api/auth/session");
+    expect(signedIn.status).toBe(200);
+    expect(signedIn.body.user.email).toBe("session@test.dev");
+  });
+
+  it("rejects an oversized upload with 422, not 500", async () => {
+    const big = Buffer.alloc(6 * 1024 * 1024, 1);
+    const r = await agent.post("/api/analyze-skin")
+      .attach("image", big, { filename: "big.png", contentType: "image/png" });
+
+    expect(r.status).toBe(422);
+    expect(r.body.error.code).toBe("INVALID_IMAGE");
+    expect(r.body.error.requestId).toMatch(/^req_/);
+  });
+
+  it("returns a JSON envelope for unknown API paths", async () => {
+    const r = await agent.get("/api/does-not-exist");
+    expect(r.status).toBe(404);
+    expect(r.body.error.code).toBe("NOT_FOUND");
+    expect(r.body.error.requestId).toMatch(/^req_/);
+  });
+});
+
+describe("input validation", () => {
+  it("turns malformed JSON into a 400, not a 500", async () => {
+    const r = await agent
+      .post("/api/auth/login")
+      .set("Content-Type", "application/json")
+      .send('{"email":oops');
+    expect(r.status).toBe(400);
+    expect(r.body.error.code).toBe("VALIDATION_ERROR");
+  });
+
+  it("clamps a negative limit instead of erroring", async () => {
+    const r = await agent.get("/api/scans?limit=-5");
+    expect(r.status).toBe(200);
+    expect(Array.isArray(r.body.items)).toBe(true);
+  });
+
+  it("rejects an unknown recommendation type", async () => {
+    const r = await agent.get("/api/recommendations?type=bogus");
+    expect(r.status).toBe(400);
+    expect(r.body.error.code).toBe("VALIDATION_ERROR");
+  });
+});

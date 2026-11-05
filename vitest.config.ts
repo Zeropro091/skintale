@@ -14,6 +14,8 @@ export default defineConfig({
       NODE_ENV: "test",
       VISION_PROVIDER: "stub",
       DB_PATH: testDbPath,
+      // Presence only: the Gemini adapter is tested against a stubbed fetch, never the network.
+      VISION_API_KEY: "test-key-not-real",
     },
   },
   // Safety net: some toolchains rewrite `node:sqlite` to the bare specifier.

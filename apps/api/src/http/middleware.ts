@@ -66,8 +66,15 @@ export function asyncHandler(
   };
 }
 
-export function notFound(_req: Request, res: Response): void {
-  res.status(404).json({ error: { code: "NOT_FOUND", message: "Endpoint tidak ditemukan." } });
+export function notFound(req: Request, res: Response): void {
+  res.status(404).json({
+    error: {
+      code: "NOT_FOUND",
+      message: "Endpoint tidak ditemukan.",
+      details: {},
+      requestId: req.requestId,
+    },
+  });
 }
 
 /** Maps thrown errors to the documented envelope. Never leaks stack or provider payload. */
@@ -82,6 +89,32 @@ export function errorHandler(err: unknown, req: Request, res: Response, _next: N
   }
 
   const message = err instanceof Error ? err.message : "Unexpected error";
+
+  // Body-parser failures (bad JSON, oversized body) are client errors, not 500s.
+  const parserType = (err as { type?: string }).type;
+  if (parserType === "entity.parse.failed" || (err instanceof SyntaxError && "body" in err)) {
+    res.status(400).json({
+      error: {
+        code: "VALIDATION_ERROR",
+        message: "Body JSON tidak valid.",
+        details: {},
+        requestId: requestIdValue,
+      },
+    });
+    return;
+  }
+  if (parserType === "entity.too.large") {
+    res.status(400).json({
+      error: {
+        code: "VALIDATION_ERROR",
+        message: "Body permintaan terlalu besar.",
+        details: {},
+        requestId: requestIdValue,
+      },
+    });
+    return;
+  }
+
   if (/Invalid metric/.test(message)) {
     res.status(502).json({
       error: {
@@ -141,28 +174,36 @@ export function hashToken(token: string): string {
   return createHash("sha256").update(token).digest("hex");
 }
 
-export function requireAuth(req: Request, _res: Response, next: NextFunction): void {
+/** Resolves the session cookie to a user, or null. Never throws. */
+function resolveSessionUser(req: Request): SessionUser | null {
   const token = (req as unknown as { cookies?: Record<string, string> }).cookies?.fw_session as string | undefined;
-  if (!token) {
-    next(new HttpError("UNAUTHENTICATED", "Silakan masuk terlebih dahulu."));
-    return;
-  }
+  if (!token) return null;
   const row = get<{ user_id: string; expires_at: string }>(
     "SELECT user_id, expires_at FROM sessions WHERE token_hash = ?",
     hashToken(token),
   );
-  if (!row || new Date(row.expires_at).getTime() < Date.now()) {
-    next(new HttpError("UNAUTHENTICATED", "Sesi berakhir. Silakan masuk lagi."));
-    return;
-  }
+  if (!row || new Date(row.expires_at).getTime() < Date.now()) return null;
   const user = get<{ id: string; email: string; display_name: string }>(
     "SELECT id, email, display_name FROM users WHERE id = ?",
     row.user_id,
   );
+  if (!user) return null;
+  return { id: user.id, email: user.email, displayName: user.display_name };
+}
+
+export function requireAuth(req: Request, _res: Response, next: NextFunction): void {
+  const user = resolveSessionUser(req);
   if (!user) {
-    next(new HttpError("UNAUTHENTICATED", "Sesi tidak valid."));
+    next(new HttpError("UNAUTHENTICATED", "Silakan masuk terlebih dahulu."));
     return;
   }
-  req.user = { id: user.id, email: user.email, displayName: user.display_name };
+  req.user = user;
+  next();
+}
+
+/** Populates req.user when a valid session exists, but lets anonymous requests through. */
+export function optionalAuth(req: Request, _res: Response, next: NextFunction): void {
+  const user = resolveSessionUser(req);
+  if (user) req.user = user;
   next();
 }

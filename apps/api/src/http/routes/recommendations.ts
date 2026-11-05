@@ -57,7 +57,11 @@ recommendationsRouter.get(
   rateLimit("read", config.limits.readsPerMinute, 60 * 1000),
   requireAuth,
   asyncHandler(async (req, res) => {
-    const type = req.query.type === "food" ? "food" : "product";
+    const typeParam = req.query.type;
+    if (typeParam !== undefined && typeParam !== "product" && typeParam !== "food") {
+      throw new HttpError("VALIDATION_ERROR", "Tipe rekomendasi harus 'product' atau 'food'.");
+    }
+    const type = typeParam === "food" ? "food" : "product";
     const profile = await loadProfile(req.user!.id);
     const requestedScanId = typeof req.query.scanId === "string" ? req.query.scanId : null;
     const scan = await loadScan(req.user!.id, requestedScanId);

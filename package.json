@@ -8,10 +8,11 @@
     "packages/*"
   ],
   "scripts": {
-    "dev": "node --import tsx apps/api/src/server.ts",
-    "start": "node --import tsx apps/api/src/server.ts",
-    "seed": "node --import tsx apps/api/src/db/seed.ts",
+    "dev": "node --env-file-if-exists=.env --import tsx apps/api/src/server.ts",
+    "start": "node --env-file-if-exists=.env --import tsx apps/api/src/server.ts",
+    "seed": "node --env-file-if-exists=.env --import tsx apps/api/src/db/seed.ts",
     "db:inspect": "node --import tsx scripts/inspect-db.ts",
+    "ui:test": "node scripts/ui-smoke.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc --noEmit"
@@ -22,6 +23,7 @@
     "@types/multer": "^2.3.0",
     "@types/node": "^22.10.2",
     "@types/supertest": "^7.2.1",
+    "playwright-core": "^1.64.1",
     "supertest": "^7.3.1",
     "tsx": "^4.23.15",
     "typescript": "^5.7.2",

@@ -2,7 +2,7 @@ import { Router } from "express";
 import { createHash, randomUUID, scrypt as scryptCb, timingSafeEqual } from "node:crypto";
 import { promisify } from "node:util";
 import { get, run } from "../../db";
-import { HttpError, asyncHandler, hashToken, requireAuth, rateLimit } from "../../http/middleware";
+import { HttpError, asyncHandler, hashToken, optionalAuth, requireAuth, rateLimit } from "../../http/middleware";
 import { loginSchema, registerSchema, validate } from "../../http/validation";
 import { config } from "../../config";
 
@@ -100,6 +100,14 @@ authRouter.post("/logout", (req, res) => {
 
 authRouter.get("/me", requireAuth, (req, res) => {
   res.json({ user: req.user });
+});
+
+/**
+ * Session probe for the UI: always 200. Browsers log a console error for every 401,
+ * so the "am I logged in?" check must not be a failing request.
+ */
+authRouter.get("/session", optionalAuth, (req, res) => {
+  res.json({ user: req.user ?? null });
 });
 
 async function createSession(userId: string, res: import("express").Response): Promise<string> {

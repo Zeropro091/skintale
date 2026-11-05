@@ -32,10 +32,10 @@ export const config = {
   /** Local driver is sqlite (node:sqlite). Postgres is the production target. */
   dbPath: resolve(env.DB_PATH ?? "data/facewish.db"),
   vision: {
-    provider: (env.VISION_PROVIDER ?? "stub") as "stub" | "openai-compatible",
-    baseUrl: env.VISION_BASE_URL ?? "https://openagentic.id/v1",
+    provider: (env.VISION_PROVIDER ?? "stub") as "stub" | "openai-compatible" | "gemini",
+    baseUrl: env.VISION_BASE_URL ?? "https://generativelanguage.googleapis.com/v1beta",
     apiKey: env.VISION_API_KEY ?? "",
-    model: env.VISION_MODEL ?? "",
+    model: env.VISION_MODEL ?? "gemini-2.5-flash",
     timeoutMs: Number(env.VISION_TIMEOUT_MS ?? 30000),
   },
   llm: {

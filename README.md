@@ -17,15 +17,19 @@ tested deterministic core, and a working HTTP API.
 
 ## Status
 
-**P1 + P2 done, plus the P3/P4 server-side path on the `stub` provider.** 67 tests green,
+**P1 + P2 done, the P3/P4 server-side path live, and a working Gemini vision adapter.**
+80 tests green,
 `tsc --noEmit` clean, and the full journey verified over real HTTP: register → preferences →
 scan → recommendations → ingredient check → delete.
 
 Not done, and not pretending otherwise:
 
-- **No web UI** (P5). The API is the deliverable so far.
-- **No real vision provider.** `VISION_PROVIDER=stub` derives metrics from an image hash —
-  structurally valid but meaningless numbers. `stub` is refused in production.
+- **The web UI is a test console, not P5.** `apps/web/index.html` exercises every endpoint on
+  one page, but there is no PWA shell, offline support, or design pass.
+- **Vision provider is real, but nothing here is clinical.** `VISION_PROVIDER=gemini` calls
+  Gemini 2.5 Flash with a JSON response schema and returns metric estimates, Indonesian
+  findings and explicit limitations. Every number stays `calibrated: false` — it is a visual
+  estimate, not dermatology. `stub` remains for tests and is refused in production.
 - **Catalogue is 9 products**, below the 30–50 target in `docs/plan.md` D4. Each row needs a
   real ingredient list with `ingredientEvidenceStatus`, so it cannot be padded out cheaply.
 - **Assistant never ran against a model.** With no `LLM_PROVIDER` it returns 503 by design.
@@ -53,6 +57,20 @@ curl -b c.txt 'localhost:3000/api/recommendations?type=product'
 
 `data/facewish.db` is created on first boot (sqlite, WAL). Tests use a throwaway
 `data/test-<timestamp>.db` per run, injected through `test.env` in `vitest.config.ts`.
+## Test console (web UI)
+
+`apps/web/index.html` is a single-file, no-build console served by the API at
+`http://localhost:3000/`: register/login, preferences with allergen chips, photo upload,
+score + six metric bars, product/food recommendations, ingredient checker, scan history and
+delete, assistant with a graceful 503 notice.
+
+End-to-end check (real Chrome, drives the actual DOM, fails on any console error):
+
+```bash
+npm run dev            # or a dedicated port: PORT=4131 node --import tsx apps/api/src/server.ts
+npm run ui:test        # BASE_URL=http://localhost:4131 by default
+```
+
 Photos are never persisted — only a hash is stored, so deleting a scan really deletes every
 trace of the image.
 
@@ -62,7 +80,8 @@ trace of the image.
 |---|---|---|
 | GET | `/healthz` | `{ ok, db, provider, nodeEnv }` |
 | POST | `/api/auth/register` · `/login` · `/logout` | httpOnly cookie session, 7 days |
-| GET | `/api/auth/me` | current user |
+| GET | `/api/auth/me` | current user (401 when anonymous) |
+| GET | `/api/auth/session` | always 200: `{ user }` or `{ user: null }` — UI probe |
 | GET/PUT | `/api/preferences` | allergies, avoided ingredients, skin type, budget |
 | POST | `/api/analyze-skin` | multipart `image`; PNG/JPEG/WebP, ≥512×512, ≤5 MB |
 | GET | `/api/scans` · `/api/scans/:id` | owner-scoped |

@@ -1,6 +1,6 @@
 import { Router, type Request, type Response } from "express";
 import { createHash, randomUUID } from "node:crypto";
-import { get, run } from "../../db";
+import { all, get, run } from "../../db";
 import { HttpError, asyncHandler, rateLimit, requireAuth } from "../../http/middleware";
 import { validateVisionOutput } from "../../http/validation";
 import { calculateSkinScore } from "../../modules/scoring/scoring";
@@ -143,12 +143,15 @@ scansRouter.get(
   rateLimit("read", config.limits.readsPerMinute, 60 * 1000),
   requireAuth,
   asyncHandler(async (req, res) => {
-    const limit = Math.min(Number(req.query.limit ?? 20) || 20, 50);
-    const rows = get<{ id: string; created_at: string }[]>(
+    // Clamp: a negative LIMIT reaches sqlite as an error and surfaces as a 500.
+    const rawLimit = Number(req.query.limit ?? 20);
+    const limit = Math.min(Math.max(Number.isFinite(rawLimit) ? Math.trunc(rawLimit) : 20, 1), 50);
+    // `all`, not `get`: this is a list query (get() returns a single row object).
+    const rows = all<{ id: string; created_at: string }>(
       "SELECT id, created_at FROM scans WHERE user_id = ? ORDER BY created_at DESC LIMIT ?",
       req.user!.id,
       limit + 1,
-    )!;
+    );
     const hasMore = rows.length > limit;
     const items = rows.slice(0, limit).map((r) => mapScan(r.id, false));
     res.json({ items, nextCursor: hasMore ? rows[limit - 1]!.created_at : null });
