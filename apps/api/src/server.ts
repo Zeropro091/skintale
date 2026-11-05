@@ -1,11 +1,10 @@
 import { createApp } from "./app";
 import { config } from "./config";
-import { seedCatalogue, seedDemoUser } from "./db/seed";
+import { seedCatalogue } from "./db/seed";
 
-// Catalog is required for recommendations to return anything, so seed it on boot.
-// Both functions are idempotent; the demo account exists only outside production.
+// The catalogue is required for recommendations to return anything, so seed it on boot.
+// Idempotent: existing rows are left alone.
 seedCatalogue();
-if (!config.isProd) seedDemoUser();
 
 const app = createApp();
 const server = app.listen(config.port, () => {

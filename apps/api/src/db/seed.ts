@@ -1,5 +1,5 @@
 import { run, get } from "./index";
-import { createHash, randomUUID } from "node:crypto";
+import { createHash } from "node:crypto";
 
 /**
  * Seed catalogue: small, curated, honest. Every product row carries an evidence status;
@@ -73,25 +73,12 @@ export function seedCatalogue(): void {
   }
 }
 
-export function seedDemoUser(): void {
-  // Dev-only convenience user. Refused outside development by the caller.
-  if (get("SELECT id FROM users WHERE email = ?", "demo@facewish.local")) return;
-  const id = randomUUID();
-  run(
-    "INSERT INTO users (id, email, password_hash, display_name, created_at) VALUES (?,?,?,?,?)",
-    id,
-    "demo@facewish.local",
-    "scrypt:seed:not-a-real-password-hash",
-    "Demo",
-    new Date().toISOString(),
-  );
-  run("INSERT INTO user_preferences (user_id, sensitivity_level, updated_at) VALUES (?,?,?)", id, "medium", new Date().toISOString());
-}
+// No demo account is seeded: a user with a placeholder password hash can never sign in,
+// and it squats an email address that a real person may want to register.
 
 // `npm run seed` executes this file directly; importing it (from server.ts or tests)
 // must not have side effects.
 if (process.argv[1]?.endsWith("seed.ts")) {
   seedCatalogue();
-  seedDemoUser();
   console.log(`[facewish] catalogue seeded into ${process.env.DB_PATH ?? "data/facewish.db"}`);
 }
