@@ -338,4 +338,5 @@ Sessions are httpOnly cookies; passwords are scrypt hashes.
 
 ## License
 
-Private. Not licensed for redistribution.
+Public source, all rights reserved. Read it, learn from it, open issues about it — but do not
+redistribute or ship it as your own without permission.
