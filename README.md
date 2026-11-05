@@ -238,6 +238,16 @@ BASE_URL=http://localhost:3000 npm run ui:test    # or point it at your own serv
 `scripts/ui-smoke.mjs` fails the run on any console error, any horizontal overflow, and any
 empty card. It is the closest thing to a user this repo has.
 
+### Exposing it for a demo
+
+```bash
+ngrok http 3000                        # prints a public https URL
+BASE_URL=https://<id>.ngrok-free.dev node scripts/public-check.mjs   # same flow, through the tunnel
+```
+
+A tunnelled demo is public: anyone with the link can register and spend vision calls. Keep the
+rate limits low, watch the provider quota, and stop the tunnel when the demo is over.
+
 ---
 
 ## Project layout
