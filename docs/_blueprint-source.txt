@@ -1,0 +1,1438 @@
+
+===== PAGE 1 =====
+Kita akan susun FaceWish — Complete Project Blueprint v1.0, yaitu dokumen acuan utama 
+yang bisa kamu berikan kepada AI coding agent sebelum agent mulai membangun, 
+mengintegrasikan, menguji, dan menyiapkan aplikasi untuk produksi.
+Blueprint ini harus menjadi single source of truth: bukan hanya diagram arsitektur, tetapi 
+juga spesifikasi fitur, alur data, algoritma, struktur kode, database, kontrak API, keamanan, 
+pengujian, dan kriteria selesai. Dengan begitu, coding agent tidak perlu menebak keputusan 
+teknis yang belum ditetapkan.
+FaceWish — Complete Technical 
+Blueprint
+‎Skintale - AI Skin Scanner App - 
+FaceWish
+Healthy Skin · Better You
+Hybrid AI + Deterministic Safety Engine
+
+===== PAGE 2 =====
+Project specification · v1.0 · 29 Oktober 2026
+FaceWish adalah web app kesehatan dan perawatan kulit yang menggabungkan analisis 
+foto wajah berbasis AI, perhitungan skor deterministik, rekomendasi skincare dan makanan, 
+pemeriksaan komposisi produk, serta AI Skin Assistant yang mempertimbangkan preferensi 
+dan alergi pengguna.
+AI Vision
+Analisis visual dan temuan
+Scoring Engine
+Perhitungan yang konsisten
+Safety Engine
+Filter alergi dan iritan
+Persistent Data
+Profil, preferensi, riwayat
+1. Tujuan dan batasan produk
+1.1 Tujuan utama
+●
+Memberikan gambaran kondisi kulit berdasarkan foto dan input pengguna.
+●
+Mengubah hasil analisis menjadi metrik yang terstruktur dan dapat dibandingkan 
+secara hati-hati.
+●
+Merekomendasikan produk berdasarkan kebutuhan kulit, preferensi, dan komposisi 
+bahan.
+●
+Memblokir rekomendasi yang bertentangan dengan alergi yang telah dicatat 
+pengguna.
+●
+Membantu pengguna memahami ingredient list dan pilihan perawatan kulit.
+●
+Menyimpan riwayat analisis dan menyediakan asisten AI dengan konteks pengguna 
+yang relevan.
+1.2 Batasan yang tidak boleh dilanggar
+FaceWish adalah alat informasi dan pendukung perawatan kulit, bukan alat diagnosis medis.
+●
+Persentase hasil vision merupakan estimasi model, bukan pengukuran klinis 
+langsung.
+●
+Skor kulit adalah indeks internal aplikasi, bukan standar kesehatan dermatologis.
+●
+Foto tidak boleh digunakan untuk menyimpulkan alergi medis, penyakit tertentu, atau 
+diagnosis pasti.
+●
+Rekomendasi makanan tidak boleh menyatakan bahwa satu makanan pasti 
+menyembuhkan jerawat atau kondisi kulit.
+
+===== PAGE 3 =====
+●
+Ketidakpastian analisis harus ditampilkan, bukan disembunyikan.
+●
+Sistem tidak boleh menjamin suatu bahan pasti aman untuk semua orang hanya 
+karena bahan tersebut masuk kategori yang direkomendasikan.
+2. Ruang lingkup fitur
+Pemisahan MVP dan fitur lanjutan membantu agent menghindari pembangunan fitur yang 
+belum diperlukan.
+Modul
+MVP
+Pengembangan berikutnya
+Autentikasi dan profil
+Register, login, profil
+Social login, pengelolaan sesi 
+lanjutan
+Skin analysis
+Upload foto, enam metrik, 
+skor
+Perbandingan tren dan analisis 
+kualitas gambar
+Dashboard
+Skor terbaru, ringkasan, 
+rekomendasi
+Tren historis dan insight personal
+Skin preferences
+Sensitivitas, alergi, bahan 
+dihindari
+Preferensi lanjutan dan pengelolaan 
+profil terperinci
+Product 
+recommendation
+Pencocokan, filter, ranking
+Sinkronisasi katalog dan marketplace
+Food 
+recommendation
+Kategori dan filter alergi
+Personalisasi nutrisi yang tervalidasi
+Ingredient checker
+Input komposisi, klasifikasi 
+bahan
+Pencarian katalog bahan yang lebih 
+luas
+AI Skin Assistant
+Chat dengan konteks 
+terpilih
+Streaming, evaluasi kualitas jawaban
+
+===== PAGE 4 =====
+Favorites
+Simpan produk dan 
+makanan
+Koleksi dan rutinitas
+Membership
+Status Free/Premium dasar
+Pembayaran dan entitlement 
+Premium
+Admin katalog
+Pengelolaan data produk
+Import otomatis dan monitoring 
+katalog
+Fitur seperti membership pembayaran, marketplace langsung, dan analisis tren lanjutan 
+tidak perlu dibangun sebelum alur inti MVP terbukti berfungsi.
+3. Arsitektur sistem dan codeflow
+Arsitektur utama menggunakan pemisahan antara AI inference dan deterministic business 
+logic. Model AI menghasilkan temuan terstruktur; backend yang tervalidasi bertanggung 
+jawab atas skor, filter keselamatan, akses data, dan respons API.
+system,system-ui,"Segoe UI",Helvetica,"Apple Color Emoji",Arial,sans-serif,"Segoe UI 
+Emoji","Segoe UI Symbol";font-size:16px;fill:rgb(237, 237, 237);}@keyframes edge-
+animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-
+dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-
+dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-
+svg{font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,"Segoe 
+UI",Helvetica,"Apple Color Emoji",Arial,sans-serif,"Segoe UI Emoji","Segoe UI Symbol";font-
+family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,"Segoe 
+UI",Helvetica,"Apple Color Emoji",Arial,sans-serif,"Segoe UI Emoji","Segoe UI 
+
+===== PAGE 5 =====
+align:center;max-width:200px;padding:2px;font-family:-apple-system-body,ui-sans-serif,-
+apple-system,system-ui,"Segoe UI",Helvetica,"Apple Color Emoji",Arial,sans-serif,"Segoe UI 
+Emoji","Segoe UI Symbol";font-size:12px;background:rgb(48, 48, 48);border:1px solid 
+rgba(255, 255, 255, 0.15);border-radius:2px;pointer-events:none;z-index:100;}#chatgpt-
+.label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#chatgpt-
+look="neo"].node .outer-path{filter:drop-shadow( 1px 2px 2px 
+
+===== PAGE 6 =====
+.edgeLabels text{font-size:13px;font-weight:600;letter-spacing:-0.08px;fill:rgb(153, 206, 
+_r_1en_ .edgeLabel .label rect{opacity:1;rx:13px;ry:13px;fill:rgb(0, 14, 26);stroke:rgb(26, 62, 
+link{stroke:rgb(175, 175, 175);stroke-width:1px;stroke-linecap:round;stroke-
+sans-serif,-apple-system,system-ui,"Segoe UI",Helvetica,"Apple Color Emoji",Arial,sans-
+serif,"Segoe UI Emoji","Segoe UI Symbol";}Web Client: React + TypeScriptExpress API + 
+ValidationAuthentication & AuthorizationUser PreferencesImage Validation & 
+StorageMultimodal Vision ProviderValidate AI OutputSkin Score EngineProduct 
+RecommendationEngineFood & Allergy FilterIngredient CheckerAI Skin 
+AssistantPostgreSQLProduct & Food Catalog
+Diagram konseptual. Implementasi dapat menambahkan object storage, cache, job queue, 
+dan observability sesuai kebutuhan operasional.
+3.1 Urutan analisis kulit
+1.
+Pengguna membuka halaman Scan dan mengambil foto atau memilih gambar dari 
+galeri.
+2.
+Frontend memeriksa tipe file dan ukuran awal, lalu mengirim permintaan 
+terautentikasi ke POST /api/analyze-skin.
+3.
+Backend memvalidasi request, memuat preferensi pengguna, memeriksa gambar, 
+dan membatasi ukuran serta frekuensi permintaan.
+4.
+Vision provider menganalisis gambar dan mengembalikan output terstruktur dengan 
+enam estimasi metrik, profil, temuan, dan tingkat keyakinan bila tersedia.
+5.
+Backend memvalidasi hasil AI. Output yang tidak sesuai schema, tidak lengkap, atau 
+tidak dapat diandalkan tidak boleh diteruskan sebagai hasil normal.
+6.
+calculateSkinScore menghitung subskor, skor akhir, label, dan status validitas 
+analisis secara deterministik.
+7.
+Hasil analisis disimpan dalam riwayat dengan versi algoritma dan referensi model 
+agar bisa diaudit.
+8.
+Frontend menerima hasil dan menampilkan skor, penjelasan, keterbatasan analisis, 
+serta pilihan untuk melihat rekomendasi.
+
+===== PAGE 7 =====
+3.2 Urutan rekomendasi
+1.
+Backend memuat hasil scan terakhir yang valid dan preferensi pengguna.
+2.
+Produk dan makanan diambil dari katalog yang dikelola aplikasi.
+3.
+Sistem menerapkan filter wajib, termasuk alergi yang cocok dengan bahan atau 
+pemicu alergi yang diketahui.
+4.
+Kandidat yang lolos dinilai berdasarkan relevansi kebutuhan, bahan aktif, preferensi, 
+dan penalti yang ditetapkan.
+5.
+Hasil diurutkan berdasarkan skor akhir; peringatan, alasan rekomendasi, dan data 
+sumber tetap disertakan.
+6.
+Frontend menampilkan hasil dengan penjelasan yang dapat dipahami pengguna.
+Rekomendasi tidak boleh dibuat hanya berdasarkan nama atau klaim pemasaran produk. 
+Jika komposisi produk tidak diketahui atau belum diverifikasi, sistem harus menampilkan 
+status tersebut.
+4. Tech stack dan standar engineering
+Stack di bawah merupakan baseline yang disarankan. Jika repository yang sudah ada 
+menggunakan teknologi berbeda, coding agent harus mengauditnya terlebih dahulu 
+sebelum melakukan migrasi.
+Lapisan
+Teknologi
+Tanggung jawab
+Frontend
+React + TypeScript
+Antarmuka dan interaksi
+Styling
+Tailwind CSS
+Sistem desain dan 
+responsivitas
+Routing
+React Router
+Navigasi halaman
+Server state
+TanStack Query
+Request, caching, invalidation
+Backend
+Node.js + Express + TypeScript
+REST API dan orkestrasi
+Validasi
+Zod
+Schema request, response, 
+dan AI
+
+===== PAGE 8 =====
+AI vision/chat
+Multimodal model API melalui provider 
+adapter
+Inferensi dan percakapan
+Rule engine
+TypeScript murni
+Scoring, matching, filtering
+Database
+PostgreSQL
+Data persisten dan relasi
+ORM
+Drizzle ORM
+Query dan migration
+Testing
+Vitest + Supertest
+Unit dan integration tests
+Browser 
+tests
+Playwright
+Alur end-to-end
+Deployment
+Docker + hosting terkelola
+Runtime dan release
+Monitoring
+Structured logs + error monitoring
+Kegagalan dan performa
+Prinsip pemilihan teknologi
+●
+Jangan menambahkan microservices untuk MVP tanpa kebutuhan nyata.
+●
+Mulai dari modular monolith: satu backend dengan modul yang batas tanggung 
+jawabnya jelas.
+●
+Jangan mencampurkan logika skor dengan route handler atau komponen UI.
+●
+API key provider AI hanya berada di server.
+●
+Semua keputusan scoring dan filter harus dapat diuji tanpa memanggil model AI.
+●
+Gunakan satu sumber kebenaran untuk setiap aturan, bukan duplikasi di frontend 
+dan backend.
+5. Struktur folder repository
+facewish/
+├── apps/
+│   ├── web/
+│   │   └── src/
+│   │       ├── app/
+
+===== PAGE 9 =====
+│   │       ├── pages/
+│   │       ├── components/
+│   │       ├── features/
+│   │       │   ├── auth/
+│   │       │   ├── dashboard/
+│   │       │   ├── skin-analysis/
+│   │       │   ├── recommendations/
+│   │       │   ├── ingredient-checker/
+│   │       │   ├── skin-assistant/
+│   │       │   └── preferences/
+│   │       ├── hooks/
+│   │       ├── lib/
+│   │       └── types/
+│   └── api/
+│       └── src/
+│           ├── app.ts
+│           ├── server.ts
+│           ├── config/
+│           ├── middleware/
+│           ├── routes/
+│           ├── modules/
+│           │   ├── auth/
+│           │   ├── users/
+│           │   ├── preferences/
+│           │   ├── skin-analysis/
+│           │   ├── scoring/
+│           │   ├── recommendations/
+│           │   ├── ingredients/
+│           │   ├── food/
+│           │   ├── assistant/
+│           │   └── favorites/
+│           ├── providers/
+│           │   ├── vision/
+│           │   └── language-model/
+│           ├── db/
+│           │   ├── schema/
+│           │   ├── migrations/
+│           │   └── seed/
+│           ├── shared/
+│           └── tests/
+├── packages/
+│   └── contracts/
+├── docs/
+│   ├── architecture.md
+│   ├── api-spec.md
+│   ├── scoring-spec.md
+│   ├── safety-rules.md
+│   └── threat-model.md
+
+===== PAGE 10 =====
+├── docker-compose.yml
+├── package.json
+├── .env.example
+└── README.md
+Ini struktur target, bukan perintah untuk langsung membuat ulang repository. Agent harus 
+menyesuaikannya dengan proyek aktual dan mempertahankan kode yang sudah benar.
+6. Spesifikasi Skin Analysis Engine
+6.1 Kontrak data hasil vision
+Enam metrik awal tetap dipertahankan:
+Metrik
+Makna internal
+Arah evaluasi
+hydration
+Estimasi tampilan terkait 
+kelembapan
+Skor berdasarkan rentang sasaran
+oiliness
+Estimasi tampilan terkait 
+minyak
+Skor keseimbangan, bukan maksimum
+texture
+Tampilan tekstur tidak 
+merata
+Perlu definisi arah yang konsisten
+pores
+Tampilan pori-pori
+Tidak boleh otomatis menganggap pori terlihat 
+sebagai penyakit
+acne
+Indikator visual jerawat
+Skor kebutuhan perawatan
+redness
+Tampilan kemerahan
+Indikator perhatian, bukan diagnosis iritasi
+Penting: model vision tidak benar-benar mengukur hidrasi atau produksi sebum dari foto 
+biasa. Nama metrik dan label UI harus menjelaskan bahwa ini adalah estimasi visual, 
+kecuali kelak ada metode pengukuran tervalidasi yang mendukung klaim lebih kuat.
+Contoh kontrak internal:
+
+===== PAGE 11 =====
+type MetricName =
+  | "hydration"
+  | "oiliness"
+  | "texture"
+  | "pores"
+  | "acne"
+  | "redness";
+type SkinAnalysisOutput = {
+  metrics: Record<MetricName, number>;
+  skinProfile:
+    | "normal"
+    | "dry"
+    | "oily"
+    | "combination"
+    | "undetermined";
+  sensitivityTags: string[];
+  findings: string[];
+  imageQuality: {
+    acceptable: boolean;
+    reasons: string[];
+  };
+  limitations: string[];
+};
+Schema produksi juga harus membatasi nilai numerik 0–100, panjang teks, jumlah temuan, 
+enum, dan format response. Provider boleh memiliki format internal sendiri, tetapi harus 
+dikonversi ke kontrak FaceWish sebelum dipakai.
+6.2 Formula scoring yang konsisten
+Bobot awal dari rancanganmu dipertahankan sebagai hipotesis desain internal, bukan bobot 
+dermatologis yang sudah terbukti.
+Metrik
+Bobot
+Kelembapan
+22%
+Minyak
+18%
+Tekstur
+15%
+
+===== PAGE 12 =====
+Pori-pori
+15%
+Jerawat
+18%
+Kemerahan
+12%
+Total
+100%
+Sebelum menghitung skor akhir, setiap metrik diubah menjadi subskor  pada rentang 0–100. 
+Untuk metrik yang mempunyai rentang sasaran, gunakan fungsi yang memberikan nilai 
+tertinggi di sekitar rentang tersebut dan menurun secara bertahap di luar rentang. Jangan 
+menetapkan rentang biologis hanya berdasarkan tebakan.
+Formula final:
+\[ S=\operatorname{round}\left( \frac{\sum_{i=1}^{6}w_iq_i}{100} \right) \]
+dengan  merupakan bobot dalam persentase dan  merupakan subskor yang sudah 
+dinormalisasi.
+Pseudocode:
+function calculateSkinScore(
+  subscores: Record<MetricName, number>
+): number {
+  const weights = {
+    hydration: 22,
+    oiliness: 18,
+    texture: 15,
+    pores: 15,
+    acne: 18,
+    redness: 12,
+  };
+  // Validate every subscore before this calculation.
+  const weightedTotal =
+    subscores.hydration * weights.hydration +
+    subscores.oiliness * weights.oiliness +
+    subscores.texture * weights.texture +
+    subscores.pores * weights.pores +
+    subscores.acne * weights.acne +
+    subscores.redness * weights.redness;
+
+===== PAGE 13 =====
+  return Math.round(weightedTotal / 100);
+}
+Kode di atas baru menghitung skor dari subskor yang sudah dikalibrasi. Fungsi konversi 
+metrik mentah menjadi subskor harus dibuat dan diuji secara terpisah sebelum dipakai.
+6.3 Label skor
+Batas kategori berikut dapat digunakan sebagai konfigurasi awal produk, bukan klasifikasi 
+kesehatan yang tervalidasi.
+Skor
+Label internal
+85–100
+Sangat Baik
+70–84
+Cukup Baik
+50–69
+Sedang
+0–49
+Perlu 
+Perhatian
+Label ini hanya menyatakan indeks internal FaceWish. UI harus menghindari klaim bahwa 
+skor tinggi berarti kulit sehat secara medis atau skor rendah berarti ada penyakit.
+6.4 Ketidakpastian dan kegagalan analisis
+Sistem harus mendukung kondisi berikut:
+●
+Gambar blur, terlalu gelap, wajah tidak terdeteksi, atau gambar tidak sesuai.
+●
+Provider AI timeout, menolak request, atau menghasilkan data tidak valid.
+●
+Metrik hilang atau berada di luar rentang.
+●
+Hasil model terlalu tidak pasti untuk diberikan sebagai estimasi yang berguna.
+Dalam kondisi tersebut, backend mengembalikan status gagal atau perlu scan ulang. 
+Jangan mengisi metrik yang hilang dengan angka 50 dan menganggap hasilnya valid.
+Setiap scan valid menyimpan versi algoritma, model/provider, timestamp, dan status 
+kualitas. Perbandingan antar-scan perlu mempertimbangkan perubahan model dan kualitas 
+gambar.
+
+===== PAGE 14 =====
+7. Product Recommendation Engine
+Nama fungsi inti: evaluateProductCompatibility.
+7.1 Model data produk
+type Product = {
+  id: string;
+  name: string;
+  brand: string;
+  category: "cleanser" | "moisturizer" | "sunscreen";
+  keyIngredients: string[];
+  potentialIrritants: string[];
+  ingredientEvidenceStatus:
+    | "verified"
+    | "manufacturer-provided"
+    | "unverified";
+  benefits: string[];
+  suitabilityTags: string[];
+  price?: number;
+  currency?: string;
+  marketplaceLinks: string[];
+};
+Katalog harus membedakan data terverifikasi, data dari produsen, dan data yang belum 
+diverifikasi. potentialIrritants merupakan daftar bahan untuk pemeriksaan kehati-hatian, 
+bukan bukti bahwa semua bahan tersebut selalu menyebabkan iritasi.
+7.2 Pipeline rekomendasi
+system,system-ui,"Segoe UI",Helvetica,"Apple Color Emoji",Arial,sans-serif,"Segoe UI 
+Emoji","Segoe UI Symbol";font-size:16px;fill:rgb(237, 237, 237);}@keyframes edge-
+animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-
+dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-
+dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-
+svg{font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,"Segoe 
+UI",Helvetica,"Apple Color Emoji",Arial,sans-serif,"Segoe UI Emoji","Segoe UI Symbol";font-
+
+===== PAGE 15 =====
+family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,"Segoe 
+UI",Helvetica,"Apple Color Emoji",Arial,sans-serif,"Segoe UI Emoji","Segoe UI 
+align:center;max-width:200px;padding:2px;font-family:-apple-system-body,ui-sans-serif,-
+apple-system,system-ui,"Segoe UI",Helvetica,"Apple Color Emoji",Arial,sans-serif,"Segoe UI 
+Emoji","Segoe UI Symbol";font-size:12px;background:rgb(48, 48, 48);border:1px solid 
+rgba(255, 255, 255, 0.15);border-radius:2px;pointer-events:none;z-index:100;}#chatgpt-
+.label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#chatgpt-
+
+===== PAGE 16 =====
+look="neo"].node .outer-path{filter:drop-shadow( 1px 2px 2px 
+.edgeLabels text{font-size:13px;font-weight:600;letter-spacing:-0.08px;fill:rgb(153, 206, 
+_r_1fm_ .edgeLabel .label rect{opacity:1;rx:13px;ry:13px;fill:rgb(0, 14, 26);stroke:rgb(26, 62, 
+link{stroke:rgb(175, 175, 175);stroke-width:1px;stroke-linecap:round;stroke-
+sans-serif,-apple-system,system-ui,"Segoe UI",Helvetica,"Apple Color Emoji",Arial,sans-
+serif,"Segoe UI Emoji","Segoe UI Symbol";}Load scan, preferences, catalogNormalize 
+product ingredientsKnown prohibited allergenmatch?Exclude product + recordreasonCheck 
+explicit avoid rulesCalculate need-based matchApply configured penaltiesApply evidence 
+anddata-quality checksSort by final match scoreReturn score, reasons,warningsYesNo
+7.3 Matching kebutuhan kulit
+Aturan awal dari spesifikasi:
+●
+Estimasi minyak di atas 60 dan indikator pori di atas 60: pertimbangkan produk yang 
+sesuai kebutuhan tersebut, dengan bahan seperti niacinamide atau salicylic acid jika 
+relevan dengan kategori dan formulasi.
+●
+Estimasi kelembapan di bawah 55: pertimbangkan produk dengan humektan dan 
+bahan pendukung skin barrier, misalnya glycerin, hyaluronic acid, atau ceramide.
+●
+Kecocokan bahan tidak berarti produk pasti efektif. Formulasi, konsentrasi, jenis 
+produk, dan toleransi pengguna juga penting.
+Angka 60 dan 55 adalah aturan awal aplikasi yang perlu dievaluasi, bukan batas klinis.
+7.4 Formula kecocokan produk
+Gunakan skor dasar , penalti , dan hasil akhir :
+
+===== PAGE 17 =====
+\[ M=\operatorname{clamp}(B-P,0,100) \]
+Jika kebijakan awal menggunakan penalti 8 poin per iritan yang cocok:
+dengan  jumlah kecocokan iritan yang unik. Penalti hanya diterapkan satu kali per bahan 
+unik, agar sinonim bahan tidak menghasilkan pengurangan ganda.
+Hard exclusion harus dilakukan sebelum formula ini. Alergi yang diketahui tidak boleh 
+sekadar diberi penalti skor.
+Hasil API juga perlu mengembalikan:
+●
+matchScore
+●
+warnings
+●
+matchedIngredients
+●
+matchReasons
+●
+excluded atau status kelayakan
+●
+ingredientEvidenceStatus
+Jangan menampilkan skor kecocokan seolah-olah merupakan probabilitas efektivitas klinis.
+8. Food Recommendation dan Allergy Engine
+Nama fungsi: filterFoodsByCategoryAndPreferences.
+8.1 Struktur data makanan
+type FoodItem = {
+  id: string;
+  name: string;
+  categories: string[];
+  nutrients: string[];
+  allergenTriggers: string[];
+  evidenceNotes: string[];
+  sourceStatus: "verified" | "unverified";
+};
+8.2 Kategori awal
+●
+Untuk Jerawat: kelompok makanan yang mengandung nutrien seperti omega-3, zinc, 
+dan antioksidan.
+●
+Untuk Kulit Kering: makanan yang menyediakan lemak sehat dan vitamin E.
+●
+Untuk Kulit Sensitif: pilihan makanan berdasarkan preferensi pengguna dan 
+informasi nutrisi yang relevan.
+
+===== PAGE 18 =====
+Kategorisasi ini hanya memberikan informasi nutrisi umum. Hubungan antara makanan dan 
+kondisi kulit berbeda antarindividu dan tidak boleh dijanjikan sebagai hasil pengobatan.
+8.3 Algoritma filter alergi
+1.
+Normalisasi tag alergi pengguna dan pemicu alergi pada katalog.
+2.
+Cocokkan berdasarkan ID atau kamus sinonim yang dikendalikan, bukan pencarian 
+substring bebas saja.
+3.
+Catat semua kecocokan.
+4.
+Tandai item sebagai hasAllergyWarning: true jika ada kecocokan.
+5.
+Untuk alergi yang sudah diketahui, jangan menyajikan item tersebut sebagai 
+rekomendasi aman.
+6.
+Jika data alergen tidak lengkap, tampilkan status yang tidak pasti; jangan 
+menyatakan makanan pasti bebas alergen.
+Contoh response:
+{
+  "foodId": "food_001",
+  "hasAllergyWarning": true,
+  "matchedAllergens": ["seafood"],
+  "recommendationStatus": "excluded"
+}
+Nilai tersebut hanya contoh kontrak. Identitas makanan, sumber data, dan pemetaan alergi 
+harus berasal dari katalog yang dikendalikan.
+9. Ingredient Checker
+Nama fungsi: analyzeIngredientsDeterministic.
+9.1 Pipeline
+system,system-ui,"Segoe UI",Helvetica,"Apple Color Emoji",Arial,sans-serif,"Segoe UI 
+Emoji","Segoe UI Symbol";font-size:16px;fill:rgb(237, 237, 237);}@keyframes edge-
+animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-
+dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-
+dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-
+
+===== PAGE 19 =====
+svg{font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,"Segoe 
+UI",Helvetica,"Apple Color Emoji",Arial,sans-serif,"Segoe UI Emoji","Segoe UI Symbol";font-
+family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,"Segoe 
+UI",Helvetica,"Apple Color Emoji",Arial,sans-serif,"Segoe UI Emoji","Segoe UI 
+align:center;max-width:200px;padding:2px;font-family:-apple-system-body,ui-sans-serif,-
+apple-system,system-ui,"Segoe UI",Helvetica,"Apple Color Emoji",Arial,sans-serif,"Segoe UI 
+Emoji","Segoe UI Symbol";font-size:12px;background:rgb(48, 48, 48);border:1px solid 
+rgba(255, 255, 255, 0.15);border-radius:2px;pointer-events:none;z-index:100;}#chatgpt-
+.label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#chatgpt-
+
+===== PAGE 20 =====
+look="neo"].node .outer-path{filter:drop-shadow( 1px 2px 2px 
+.edgeLabels text{font-size:13px;font-weight:600;letter-spacing:-0.08px;fill:rgb(153, 206, 
+_r_1g9_ .edgeLabel .label rect{opacity:1;rx:13px;ry:13px;fill:rgb(0, 14, 26);stroke:rgb(26, 62, 
+link{stroke:rgb(175, 175, 175);stroke-width:1px;stroke-linecap:round;stroke-
+sans-serif,-apple-system,system-ui,"Segoe UI",Helvetica,"Apple Color Emoji",Arial,sans-
+serif,"Segoe UI Emoji","Segoe UI Symbol";}Raw ingredient textTokenize by comma 
+andnewlineNormalize names andsynonymsMatch user-specific exclusionsMatch known 
+concern rulesMatch beneficial ingredientdatabaseResolve classificationprecedenceCalculate 
+transparent summaryReturn per-ingredient statusand warnings
+9.2 Prioritas klasifikasi
+Urutan keputusan:
+1.
+avoid — bahan cocok dengan alergi atau aturan penghindaran eksplisit pengguna.
+2.
+caution — bahan cocok dengan aturan kehati-hatian yang relevan.
+3.
+beneficial — bahan mempunyai relevansi yang terdokumentasi terhadap kebutuhan 
+pengguna.
+4.
+neutral — tidak ada aturan yang cukup untuk klasifikasi lain.
+5.
+unknown — nama tidak dapat dinormalisasi atau basis data tidak cukup.
+Kategori beneficial tidak berarti aman untuk semua pengguna. Jika bahan cocok dengan 
+aturan avoid, status tersebut tetap menjadi prioritas.
+
+===== PAGE 21 =====
+9.3 Contoh output
+{
+  "items": [
+    {
+      "name": "Niacinamide",
+      "status": "beneficial",
+      "reasons": ["relevant_to_user_profile"]
+    },
+    {
+      "name": "Alcohol Denat",
+      "status": "caution",
+      "reasons": ["configured_concern_rule"]
+    },
+    {
+      "name": "Fragrance",
+      "status": "avoid",
+      "reasons": ["user_preference_match"]
+    }
+  ],
+  "summary": {
+    "avoidCount": 1,
+    "cautionCount": 1,
+    "beneficialCount": 1,
+    "unknownCount": 0
+  },
+  "verdict": "review_required"
+}
+9.4 Skor checker
+Jangan mengarang skor 0–100 dari jumlah bahan yang tampak baik atau buruk tanpa model 
+penilaian yang terdokumentasi.
+Untuk MVP, prioritaskan hasil per bahan, alasan, kecocokan preferensi, dan peringatan. Jika 
+ingin menampilkan skor ringkasan, tentukan formula, sumber bukti, aturan bahan yang tidak 
+diketahui, dan validasi terlebih dahulu. Jangan menyebutnya skor keamanan medis.
+10. REST API contract
+Semua endpoint menggunakan prefix /api. Untuk request JSON, backend harus melakukan 
+validasi schema sebelum menjalankan business logic.
+10.1 Endpoint utama
+Method
+Endpoint
+Fungsi
+
+===== PAGE 22 =====
+GET
+/api/health
+Status layanan
+POST
+/api/auth/register
+Registrasi
+POST
+/api/auth/login
+Login
+POST
+/api/auth/logout
+Logout
+GET
+/api/profile
+Profil pengguna
+PUT
+/api/profile
+Update profil
+GET
+/api/preferences
+Ambil preferensi
+PUT
+/api/preferences
+Update preferensi
+POST
+/api/analyze-skin
+Analisis foto
+GET
+/api/skin-scans
+Riwayat scan
+GET
+/api/skin-scans/:id
+Detail scan
+DELETE
+/api/skin-scans/:id
+Hapus scan milik pengguna
+POST
+/api/recommendations
+Rekomendasi skincare
+GET
+/api/foods
+Katalog dan kategori 
+makanan
+
+===== PAGE 23 =====
+POST
+/api/check-ingredients
+Pemeriksaan bahan
+POST
+/api/skin-assistant
+AI Skin Assistant
+GET
+/api/favorites
+Daftar favorit
+POST
+/api/favorites
+Tambah favorit
+DELETE
+/api/favorites/:id
+Hapus favorit
+Jika endpoint harus mengambil hasil analisis terakhir, backend mengambil scan milik 
+pengguna yang sedang terautentikasi. Backend tidak boleh menerima userId dari body lalu 
+menganggapnya sebagai otorisasi.
+10.2 Contoh request analisis
+{
+  "imageBase64": "<image-data>",
+  "contentType": "image/jpeg"
+}
+Preferensi sebaiknya dibaca dari database di server. Jika aplikasi menerima preferensi 
+tambahan dalam request, data tersebut harus divalidasi dan tidak boleh dipakai untuk 
+melewati aturan keamanan.
+Contoh response:
+{
+  "scanId": "scan_example",
+  "status": "completed",
+  "skinScore": 68,
+  "scoreLabel": "Sedang",
+  "skinProfile": "combination",
+  "metrics": {
+    "hydration": 48,
+    "oiliness": 72,
+    "texture": 62,
+    "pores": 68,
+    "acne": 45,
+    "redness": 28
+  },
+
+===== PAGE 24 =====
+  "algorithmVersion": "1.0.0",
+  "limitations": [
+    "Visual estimates are not clinical measurements."
+  ]
+}
+Nilai dalam contoh adalah ilustrasi format API, bukan hasil yang sudah tervalidasi. Jangan 
+mengunci contoh skor 68 sebagai expected output sampai fungsi normalisasi dan formula 
+final selesai ditentukan.
+10.3 Format error seragam
+{
+  "error": {
+    "code": "INVALID_IMAGE",
+    "message": "The uploaded image could not be processed.",
+    "requestId": "req_example"
+  }
+}
+Gunakan HTTP status yang sesuai, antara lain:
+●
+400 — request tidak valid.
+●
+401 — belum terautentikasi.
+●
+403 — tidak memiliki izin.
+●
+404 — resource tidak ditemukan atau tidak boleh diakses.
+●
+413 — payload terlalu besar.
+●
+422 — input valid secara struktur tetapi tidak dapat diproses.
+●
+429 — batas permintaan terlampaui.
+●
+502 atau 503 — provider eksternal gagal atau tidak tersedia.
+●
+500 — kesalahan internal yang tidak terduga.
+Jangan mengembalikan stack trace, token, password, atau data sensitif dalam error 
+response.
+10.4 Ketentuan endpoint penting
+POST /api/recommendations
+●
+Menggunakan scan valid dan preferensi pengguna.
+●
+Mendukung filter kategori dan pagination.
+●
+Menyertakan alasan, peringatan, dan status data produk.
+●
+Tidak mengembalikan produk yang dikecualikan oleh aturan alergi wajib.
+POST /api/check-ingredients
+●
+Menerima teks komposisi dan konteks preferensi dari database.
+●
+Membatasi panjang input dan jumlah token bahan.
+●
+Mengembalikan status tiap bahan dan alasan klasifikasi.
+
+===== PAGE 25 =====
+●
+Tidak perlu memanggil AI untuk aturan deterministik.
+POST /api/skin-assistant
+●
+Menerima pesan pengguna dan konteks yang diizinkan.
+●
+Mengambil data profil serta scan yang relevan secara server-side.
+●
+Tidak mempercayai skor, alergi, atau riwayat yang dikirim bebas oleh frontend.
+●
+Mengarahkan pertanyaan berisiko medis ke respons yang berhati-hati dan 
+menyarankan bantuan profesional bila sesuai.
+●
+Memperlakukan isi pesan, data katalog, dan hasil retrieval sebagai data, bukan 
+instruksi sistem.
+11. Database schema
+Untuk MVP, gunakan PostgreSQL dengan relasi yang eksplisit. Lima tabel awal dari 
+rancanganmu perlu diperluas dengan tabel sesi, referensi bahan, dan dukungan audit agar 
+kebutuhan operasional terpenuhi.
+system,system-ui,"Segoe UI",Helvetica,"Apple Color Emoji",Arial,sans-serif,"Segoe UI 
+Emoji","Segoe UI Symbol";font-size:16px;fill:rgb(237, 237, 237);}@keyframes edge-
+animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-
+dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-
+dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-
+svg{font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,"Segoe 
+UI",Helvetica,"Apple Color Emoji",Arial,sans-serif,"Segoe UI Emoji","Segoe UI Symbol";font-
+.relationshipLabelBox{fill:rgb(48, 48, 48);opacity:0.7;background-color:rgb(48, 48, 
+apple-system,system-ui,"Segoe UI",Helvetica,"Apple Color Emoji",Arial,sans-serif,"Segoe UI 
+
+===== PAGE 26 =====
+_r_1h9_ .node polygon{fill:rgb(9, 23, 44);stroke:rgb(31, 78, 148);stroke-width:1px;}#chatgpt-
+system-body,ui-sans-serif,-apple-system,system-ui,"Segoe UI",Helvetica,"Apple Color 
+Emoji",Arial,sans-serif,"Segoe UI Emoji","Segoe UI 
+Symbol";}USERSuuididPKtextemailtextpassword_hashtextfull_nametimestamptzcreated_at
+USER_SESSIONSUSER_PREFERENCESuuiduser_idPKjsonbskin_sensitivitiesjsonbfood_
+allergiesjsonbavoided_ingredientstimestamptzupdated_atSKIN_SCANSuuididPKuuiduser_id
+FKtextimage_storage_keyintegerskin_scoretextskin_profilejsonbmetrics_jsontextalgorithm_v
+ersiontimestamptzcreated_atSAVED_FAVORITESuuididPKuuiduser_idFKtextitem_typeuuidi
+tem_idtimestamptzcreated_atPRODUCTS_CATALOGuuididPKtextnametextbrandtextcatego
+ryjsonbkey_ingredientsjsonbpotential_irritantsFOODS_CATALOGuuididPKtextnamejsonbcat
+egoriesjsonballergen_triggersRECOMMENDATION_EVENTShasconfiguresownssavesrefer
+enced_byreferenced_byproducesreceives
+Diagram di atas adalah ringkasan relasi. Implementasi final tetap harus memiliki kolom, 
+constraint, indeks, migration, dan kebijakan penghapusan yang terdefinisi lengkap.
+11.1 Definisi tabel
+users
+Identitas pengguna, email/nomor telepon yang dinormalisasi, hash password, nama, tanggal 
+lahir bila diperlukan, level membership, serta timestamp. Hindari menyimpan alamat lengkap 
+jika tidak ada kebutuhan fitur yang jelas.
+user_sessions
+
+===== PAGE 27 =====
+ID sesi, user_id, hash token atau identifier sesi, waktu kedaluwarsa, waktu pencabutan, dan 
+metadata minimal untuk manajemen sesi.
+user_preferences
+Relasi satu-ke-satu dengan pengguna; menyimpan sensitivitas, alergi makanan, bahan yang 
+dihindari, serta preferensi makanan. Gunakan enum atau ID referensi yang konsisten bila 
+memungkinkan.
+skin_scans
+Riwayat analisis, skor, label, profil, enam metrik, temuan, status kualitas gambar, versi 
+algoritma, referensi provider/model, dan referensi foto jika disimpan.
+products_catalog
+Identitas produk, brand, kategori, bahan, potensi perhatian, manfaat, instruksi, sumber data, 
+status verifikasi, tanggal pemeriksaan terakhir, dan tautan resmi/marketplace.
+foods_catalog
+Data makanan, kategori, informasi nutrisi yang bersumber, pemicu alergi, dan status 
+kelengkapan data.
+saved_favorites
+Referensi favorit pengguna terhadap produk atau makanan. Gunakan desain relasi yang 
+menjaga integritas referensi, bukan foreign key polimorfik tanpa validasi.
+recommendation_events
+Catatan minimum yang dibutuhkan untuk audit rekomendasi: scan sumber, versi aturan, 
+item yang direkomendasikan atau dikecualikan, serta alasan. Hindari menyimpan data 
+pribadi berlebihan.
+11.2 Database rules
+●
+Primary key menggunakan UUID atau strategi konsisten yang sesuai.
+●
+Semua relasi kepemilikan memiliki foreign key.
+●
+Tambahkan unique constraint pada email atau identifier login yang dinormalisasi.
+●
+Tambahkan indeks untuk user_id, created_at, kategori katalog, dan pencarian yang 
+benar-benar digunakan.
+●
+Gunakan migration version control dan transaksi untuk perubahan schema.
+●
+Simpan timestamp dalam UTC, lalu format sesuai zona waktu pada UI.
+●
+Tentukan ON DELETE secara eksplisit agar penghapusan akun tidak meninggalkan 
+data pribadi yang tidak diinginkan.
+●
+Jangan simpan password dalam bentuk plaintext.
+●
+Jangan mengandalkan kolom JSONB untuk semua relasi; gunakan tabel relasional 
+saat integritas dan pencarian data memerlukannya.
+
+===== PAGE 28 =====
+12. Authentication, privacy, dan security
+Karena FaceWish menangani foto wajah dan preferensi kesehatan, keamanan perlu 
+dirancang sebelum integrasi AI, bukan ditambahkan setelah aplikasi selesai.
+12.1 Authentication
+●
+Password disimpan dengan algoritma hashing yang sesuai, seperti Argon2id melalui 
+library yang terpelihara.
+●
+Untuk web app, pertimbangkan sesi server-side dengan cookie HttpOnly, Secure, 
+dan SameSite yang sesuai.
+●
+Terapkan rate limit pada login, register, scan, dan endpoint AI.
+●
+Semua endpoint privat harus memeriksa identitas dan hak akses.
+●
+Pengguna hanya boleh membaca, mengubah, dan menghapus data miliknya.
+●
+Logout harus mencabut sesi yang relevan.
+12.2 Foto wajah dan data pribadi
+Tetapkan kebijakan yang eksplisit untuk setiap jenis data:
+Data
+Aturan
+Foto scan
+Jangan disimpan permanen secara default jika tidak 
+diperlukan
+Riwayat scan
+Simpan sesuai kebutuhan fitur dan pilihan pengguna
+API credentials
+Server-side secrets only
+Preferensi alergi
+Batasi akses dan penggunaan
+Log error
+Jangan masukkan foto, password, token, atau payload sensitif
+Penghapusan 
+akun
+Hapus atau anonimisasi data terkait sesuai kebijakan retensi
+Backup
+Terapkan akses terbatas dan kebijakan retensi
+
+===== PAGE 29 =====
+Jika memakai penyimpanan objek, gunakan bucket privat, URL bertanda tangan yang 
+kedaluwarsa, dan pemeriksaan otorisasi di backend. Jangan menaruh gambar wajah dalam 
+URL publik permanen.
+12.3 AI provider security
+●
+Kirim hanya data yang diperlukan untuk analisis.
+●
+Verifikasi kebijakan retensi dan penggunaan data provider sebelum mengirim foto 
+pengguna.
+●
+Tetapkan timeout, retry terbatas, dan batas biaya.
+●
+Jangan membiarkan provider mengakses database secara langsung.
+●
+Validasi semua hasil provider seolah-olah berasal dari input eksternal yang tidak 
+tepercaya.
+●
+Gunakan adapter agar provider bisa diganti tanpa menulis ulang seluruh business 
+logic.
+12.4 Threat model minimum
+Ancaman
+Mitigasi
+IDOR / akses scan pengguna lain
+Ownership checks pada setiap query privat
+Upload file berbahaya
+Validasi MIME, signature file, ukuran, dan decoding
+Kebocoran API key
+Secret management dan redaksi log
+Prompt injection pada AI Assistant
+Instruksi server terpisah, tool allowlist, validasi output
+Manipulasi skor dari frontend
+Hitung ulang seluruh skor di server
+Bypass filter alergi
+Safety engine server-side dengan unit test
+Penyalahgunaan API dan biaya
+Rate limit, kuota, timeout, dan monitoring
+Kebocoran foto
+Private storage, retensi, access control, penghapusan
+
+===== PAGE 30 =====
+13. AI Skin Assistant
+AI Assistant adalah lapisan bahasa untuk menjelaskan hasil dan membantu pengguna 
+memahami opsi perawatan. Ia bukan otoritas untuk mengganti hasil deterministic engine.
+Input konteks
+●
+Pesan terbaru pengguna.
+●
+Profil kulit dan scan terakhir yang valid.
+●
+Preferensi sensitivitas serta alergi yang relevan.
+●
+Produk atau bahan yang sedang dibahas.
+●
+Riwayat percakapan terbatas yang memang dibutuhkan.
+Alur eksekusi
+system,system-ui,"Segoe UI",Helvetica,"Apple Color Emoji",Arial,sans-serif,"Segoe UI 
+Emoji","Segoe UI Symbol";font-size:16px;fill:rgb(237, 237, 237);}@keyframes edge-
+animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-
+dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-
+dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-
+svg{font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,"Segoe 
+UI",Helvetica,"Apple Color Emoji",Arial,sans-serif,"Segoe UI Emoji","Segoe UI Symbol";font-
+family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,"Segoe 
+UI",Helvetica,"Apple Color Emoji",Arial,sans-serif,"Segoe UI Emoji","Segoe UI 
+
+===== PAGE 31 =====
+align:center;max-width:200px;padding:2px;font-family:-apple-system-body,ui-sans-serif,-
+apple-system,system-ui,"Segoe UI",Helvetica,"Apple Color Emoji",Arial,sans-serif,"Segoe UI 
+Emoji","Segoe UI Symbol";font-size:12px;background:rgb(48, 48, 48);border:1px solid 
+rgba(255, 255, 255, 0.15);border-radius:2px;pointer-events:none;z-index:100;}#chatgpt-
+.label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#chatgpt-
+look="neo"].node .outer-path{filter:drop-shadow( 1px 2px 2px 
+
+===== PAGE 32 =====
+.edgeLabels text{font-size:13px;font-weight:600;letter-spacing:-0.08px;fill:rgb(153, 206, 
+_r_1hq_ .edgeLabel .label rect{opacity:1;rx:13px;ry:13px;fill:rgb(0, 14, 26);stroke:rgb(26, 62, 
+link{stroke:rgb(175, 175, 175);stroke-width:1px;stroke-linecap:round;stroke-
+sans-serif,-apple-system,system-ui,"Segoe UI",Helvetica,"Apple Color Emoji",Arial,sans-
+serif,"Segoe UI Emoji","Segoe UI Symbol";}User messageAuthenticate and validateLoad 
+allowed user contextConstruct bounded promptLanguage model providerValidate output and 
+safetyOutput acceptable?Return explanationSafe fallback or retryYesNo
+Aturan assistant
+1.
+Tidak mendiagnosis penyakit berdasarkan foto.
+2.
+Tidak menjanjikan hasil kosmetik atau pengobatan.
+3.
+Tidak menyatakan produk pasti aman hanya karena skor kecocokan tinggi.
+4.
+Tidak mengabaikan alergi atau preferensi yang sudah tercatat.
+5.
+Tidak mengarang kandungan produk atau hasil penelitian.
+6.
+Mengakui keterbatasan informasi dan menyarankan bantuan profesional ketika 
+gejala atau pertanyaan memerlukannya.
+7.
+Menggunakan bahasa yang sederhana, tidak menghakimi, dan sesuai konteks 
+pengguna.
+14. Frontend dan UX blueprint
+Frontend harus mengonsumsi kontrak API, bukan mengimplementasikan ulang business 
+logic.
+AI Skin Analysis Tool for Salons, Retailers & Clinics | SKNN
+Dashboard
+Skor scan terakhir, ringkasan enam metrik, status analisis, dan akses cepat ke rekomendasi.
+Hautanalyse - Finde deinen Hauttyp | Judith Williams Cosmetics
+Skin Scan
+Instruksi foto, kamera/upload, status pemrosesan, validasi kualitas gambar, serta opsi scan 
+ulang.
+
+===== PAGE 33 =====
+Noli BDNA
+Recommendations
+Kartu produk dengan kecocokan, alasan, bahan, peringatan, sumber informasi, dan status 
+verifikasi.
+This iPhone app scans your skincare products to tell you if it’s right for you | iMore
+Ingredient Checker
+Input komposisi, hasil per bahan, alasan klasifikasi, serta bahan yang tidak dikenali.
+UI states yang wajib tersedia
+Untuk setiap halaman yang mengambil data, definisikan:
+●
+Loading state.
+●
+Empty state.
+●
+Success state.
+●
+Validation error.
+●
+Network/provider error.
+●
+Unauthorized state.
+●
+Retry atau recovery action jika aman.
+●
+Mobile, tablet, dan desktop layout.
+Jangan menampilkan skor lama seolah-olah itu hasil scan terbaru jika permintaan analisis 
+gagal.
+15. Testing dan acceptance criteria
+15.1 Unit tests
+●
+Bobot scoring berjumlah 100%.
+●
+Skor berada pada rentang 0–100.
+●
+Semua batas kategori diuji tepat di bawah, pada, dan di atas ambang.
+●
+Data metrik hilang, NaN, string, dan angka di luar rentang ditolak.
+●
+Matching produk tidak menghitung sinonim bahan yang sama berulang kali.
+●
+Produk dengan alergi yang cocok tidak lolos hard-filter.
+●
+Food allergy matcher menangani variasi penulisan melalui kamus sinonim yang 
+dikendalikan.
+●
+Ingredient checker memprioritaskan avoid di atas caution dan beneficial.
+●
+Hasil tidak valid dari provider tidak pernah menjadi scan sukses.
+15.2 Integration dan end-to-end tests
+●
+Register → login → update preference.
+●
+Upload → validasi → vision provider → scoring → simpan scan.
+
+===== PAGE 34 =====
+●
+Scan → rekomendasi produk → filter alergi.
+●
+Input komposisi → normalisasi → klasifikasi → hasil.
+●
+AI Assistant → load context → response validation.
+●
+Pengguna A tidak bisa mengakses scan pengguna B.
+●
+Penghapusan scan dan akun mengikuti kebijakan retensi.
+●
+Provider timeout tidak menyebabkan data parsial dianggap sukses.
+15.3 Definition of Done
+Sebuah fitur dianggap selesai jika:
+1.
+Implementasi mengikuti spesifikasi yang disetujui.
+2.
+Request dan response tervalidasi.
+3.
+Unit test dan integration test yang relevan lulus.
+4.
+Error handling dan logging tersedia.
+5.
+Tidak ada secret di frontend atau repository.
+6.
+Dokumentasi diperbarui.
+7.
+Perilaku kritis dapat direproduksi dan diaudit.
+8.
+Tidak ada blocker keamanan yang diketahui dan dibiarkan tanpa mitigasi.
+16. Deployment dan operasi
+Environment
+Pisahkan setidaknya:
+●
+development — pengembangan lokal.
+●
+staging — verifikasi sebelum rilis.
+●
+production — pengguna sebenarnya.
+Masing-masing harus memiliki database, kredensial, dan konfigurasi yang sesuai. Jangan 
+menggunakan data pribadi pengguna produksi untuk eksperimen development.
+Release pipeline
+system,system-ui,"Segoe UI",Helvetica,"Apple Color Emoji",Arial,sans-serif,"Segoe UI 
+Emoji","Segoe UI Symbol";font-size:16px;fill:rgb(237, 237, 237);}@keyframes edge-
+animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-
+dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-
+dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-
+
+===== PAGE 35 =====
+svg{font-family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,"Segoe 
+UI",Helvetica,"Apple Color Emoji",Arial,sans-serif,"Segoe UI Emoji","Segoe UI Symbol";font-
+family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,"Segoe 
+UI",Helvetica,"Apple Color Emoji",Arial,sans-serif,"Segoe UI Emoji","Segoe UI 
+_r_1j3_ .node path{fill:rgb(9, 23, 44);stroke:rgb(31, 78, 148);stroke-width:1px;}#chatgpt-
+path{fill:rgb(175, 175, 175)!important;stroke-width:0;stroke:rgb(175, 175, 175);}#chatgpt-
+family:-apple-system-body,ui-sans-serif,-apple-system,system-ui,"Segoe 
+UI",Helvetica,"Apple Color Emoji",Arial,sans-serif,"Segoe UI Emoji","Segoe UI Symbol";font-
+size:12px;background:rgb(48, 48, 48);border:1px solid rgba(255, 255, 255, 0.15);border-
+.flowchartTitleText{text-anchor:middle;font-size:18px;fill:rgb(237, 237, 237);}#chatgpt-
+
+===== PAGE 36 =====
+.edgeLabels text{font-size:13px;font-weight:600;letter-spacing:-0.08px;fill:rgb(153, 206, 
+_r_1j3_ .edgeLabel .label rect{opacity:1;rx:13px;ry:13px;fill:rgb(0, 14, 26);stroke:rgb(26, 62, 
+link{stroke:rgb(175, 175, 175);stroke-width:1px;stroke-linecap:round;stroke-
+serif,-apple-system,system-ui,"Segoe UI",Helvetica,"Apple Color Emoji",Arial,sans-
+serif,"Segoe UI Emoji","Segoe UI Symbol";}Pull requestLint + TypecheckUnit testsIntegration 
+testsBuild artifactsSecurity checksDeploy stagingSmoke tests + manual reviewApproved 
+production releaseMonitor + rollback if needed
+Observability
+Pantau setidaknya:
+●
+API latency dan error rate.
+●
+Kegagalan serta timeout provider AI.
+●
+Waktu pemrosesan scan.
+●
+Jumlah scan yang ditolak karena kualitas gambar.
+●
+Konsumsi token, biaya provider, dan rate limit.
+●
+Error database dan status koneksi.
+●
+Jumlah rekomendasi yang dikecualikan oleh aturan keselamatan.
+
+===== PAGE 37 =====
+Gunakan requestId untuk menelusuri kegagalan tanpa mencatat data sensitif.
+Backup dan recovery
+Tetapkan frekuensi backup, retensi, enkripsi, akses terbatas, dan uji pemulihan berkala. 
+Migration harus bisa dilacak, dan perubahan database berisiko tinggi perlu memiliki 
+prosedur rollback atau pemulihan yang jelas.
+17. Roadmap implementasi
+Fas
+e
+Fokus
+Exit criteria
+0
+Audit repository
+Inventaris kode dan risiko selesai
+1
+Finalisasi spesifikasi
+Formula, schema, API, dan aturan safety disetujui
+2
+Core engine
+Scoring, ingredient checker, dan filter alergi lulus unit test
+3
+Database dan API
+Migration, autentikasi, profil, dan preferensi berfungsi
+4
+Integrasi vision
+Scan, validasi output, penyimpanan, dan error handling 
+lulus
+5
+Rekomendasi
+Katalog, matching, exclusion, dan ranking terintegrasi
+6
+Frontend dan 
+assistant
+Alur pengguna utama berfungsi dari ujung ke ujung
+7
+QA dan staging
+E2E, security review, serta smoke test lulus
+8
+Production readiness
+Retensi data, backup, monitoring, dan release plan siap
+
+===== PAGE 38 =====
+Urutan ini berbasis dependensi, bukan janji durasi. Estimasi waktu baru masuk akal setelah 
+agent memeriksa ukuran repository dan seberapa banyak fitur yang sudah tersedia.
+18. Master prompt untuk AI coding agent
+Berikut instruksi eksekusi yang bisa digunakan bersama blueprint ini. Berikan juga akses ke 
+repository proyek aktual.
+FACEWISH — MASTER ENGINEERING 
+INSTRUCTION
+Role
+Act as the senior software architect, backend engineer, frontend engineer, and QA engineer 
+responsible for delivering FaceWish.
+The supplied Complete Technical Blueprint is the project specification. The existing 
+repository is the source of truth for what has already been implemented.
+Primary Objective
+Build FaceWish as a maintainable, secure, testable web application using a hybrid AI + 
+deterministic rule-based architecture.
+Mandatory Workflow
+Phase 0 — Audit
+●
+Inspect the repository before changing files.
+●
+Identify the actual frontend, backend, database, dependencies, routes, and tests.
+●
+Identify what exists, what is missing, and what conflicts with the blueprint.
+●
+Do not rewrite valid code merely to match a preferred folder structure.
+●
+Produce an audit report and a prioritized implementation plan.
+Phase 1 — Resolve Specification Gaps
+Before implementing ambiguous behavior, document and resolve:
+●
+Metric normalization and the final skin scoring formula.
+●
+Score labels and boundary conditions.
+●
+AI provider, output schema, image-quality policy, and failure behavior.
+●
+Allergy exclusion, sensitivity rules, ingredient synonyms, and unknown ingredient 
+handling.
+
+===== PAGE 39 =====
+●
+API contracts, database relationships, data retention, and authentication.
+●
+Acceptance criteria for every critical module.
+Do not silently invent clinical thresholds or represent unvalidated heuristics as 
+dermatological facts.
+Phase 2 — Build the Core Engine
+Implement independent, deterministic modules for:
+●
+calculateSkinScore
+●
+evaluateProductCompatibility
+●
+filterFoodsByCategoryAndPreferences
+●
+analyzeIngredientsDeterministic
+Add unit tests for boundary cases, malformed inputs, unknown ingredients, duplicate 
+ingredient synonyms, and allergy exclusions.
+Phase 3 — Build Infrastructure
+Implement database migrations, authentication, authorization, profile management, 
+preferences, and scan history. Ensure every private resource is scoped to the authenticated 
+user.
+Phase 4 — Integrate AI
+Implement a provider adapter for vision and language models. Validate provider output, 
+apply timeouts and bounded retries, and handle failures without producing fabricated results.
+Keep AI inference separate from scoring and safety enforcement.
+Phase 5 — Integrate the Application
+Connect the frontend to the implemented API contracts. Implement loading, empty, error, 
+retry, and success states. Avoid mock data in production execution paths.
+Phase 6 — Verify
+Run lint, typecheck, unit tests, integration tests, and applicable end-to-end tests. Review 
+authentication, privacy, file upload handling, API costs, dependency security, and data 
+deletion.
+Phase 7 — Release Readiness
+Prepare staging deployment, environment configuration, database backup and recovery, 
+monitoring, migration procedures, and rollback instructions.
+Never deploy to production or perform destructive data changes without explicit 
+authorization.
+
+===== PAGE 40 =====
+Engineering Rules
+●
+Follow the existing compatible stack unless a justified migration is approved.
+●
+Keep business logic in testable modules, not UI components or route handlers.
+●
+Validate every external input and AI response.
+●
+Keep secrets server-side.
+●
+Use parameterized queries or safe ORM operations.
+●
+Document assumptions and unresolved decisions.
+●
+Do not mark a feature complete unless its acceptance criteria and tests pass.
+●
+Never claim tests passed without actually running them.
+●
+Report unavailable dependencies, provider limitations, and remaining risks honestly.
+Reporting Format
+At each checkpoint, report:
+1.
+Changes made.
+2.
+Files created or modified.
+3.
+Tests executed and actual results.
+4.
+Security and data integrity considerations.
+5.
+Known limitations.
+6.
+Decisions requiring approval.
+7.
+The next recommended step.
+Begin with Phase 0. Do not start a large implementation before auditing the repository and 
+identifying the blocking specification gaps.
+19. Hal yang masih harus diputuskan sebelum blueprint 
+dikunci
+Blueprint di atas sudah memberikan struktur teknis yang luas, tetapi beberapa keputusan 
+memang harus ditetapkan berdasarkan repository, validasi, dan kebutuhan produk aktual.
+Finalisasi spesifikasi FaceWish
+Pilih yang sudah kamu ketahui. Bagian yang belum diputuskan boleh dibiarkan kosong.
+1. Kondisi repository saat ini
+Apakah FaceWish sudah memiliki frontend, backend, atau masih berupa prototype?
+Frontend sudah ada
+Frontend dan backend sudah ada
+Baru blueprint/desain
+2. Target database
+
+===== PAGE 41 =====
+Pilih database utama untuk penyimpanan persisten.
+PostgreSQL
+Firebase / Firestore
+Belum ditentukan
+3. Provider AI Vision
+Pilih arah integrasi awal; provider tetap dapat diganti lewat adapter.
+OpenAI vision API
+Gemini vision API
+Belum ditentukan
+4. Target rilis
+Tentukan tingkat kesiapan yang ingin dicapai terlebih dahulu.
+MVP yang berfungsi
+Production-ready
+MVP dahulu, lanjut produksi
+Finalisasi blueprint
+Saran akhir: simpan blueprint ini sebagai dokumen utama proyek, lalu pecah spesifikasinya 
+menjadi architecture.md, api-spec.md, scoring-spec.md, safety-rules.md, dan threat-
+model.md. AI coding agent akan bekerja lebih konsisten jika setiap modul mempunyai 
+spesifikasi yang bisa diverifikasi, bukan hanya satu prompt panjang.

@@ -1,0 +1,12 @@
+node_modules/
+.env
+.env.local
+dist/
+coverage/
+*.log
+
+# Local sqlite databases (dev + per-run test files)
+data/
+*.db
+*.db-shm
+*.db-wal
