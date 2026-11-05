@@ -1,10 +1,13 @@
 // Drives the real UI in Chrome: register → preferences → scan → recommendations →
 // ingredient check → history → delete. Fails loudly on any console/page error.
+//
+// Self-contained: unless BASE_URL is set, it boots its own throwaway server on :4399
+// (stub vision provider, temp SQLite) so the check never depends on a running dev server.
 import { chromium } from "playwright-core";
 import { deflateSync } from "node:zlib";
-import { writeFileSync, mkdirSync } from "node:fs";
+import { writeFileSync, mkdirSync, rmSync } from "node:fs";
+import { spawn } from "node:child_process";
 
-const BASE = process.env.BASE_URL ?? "http://localhost:4131";
 const email = `ui-${Date.now()}@facewish.dev`;
 const password = "password123";
 
@@ -62,6 +65,46 @@ mkdirSync("data", { recursive: true });
 const face = `data/ui-face-${Date.now()}.png`;
 writeFileSync(face, makePng(600, 600, 7));
 
+// --- optional throwaway server -------------------------------------------------
+let server = null;
+let serverDb = null;
+let base = process.env.BASE_URL;
+
+if (!base) {
+  const port = Number(process.env.UI_PORT ?? 4399);
+  base = `http://localhost:${port}`;
+  serverDb = `data/ui-test-${Date.now()}.db`;
+  server = spawn(process.execPath, ["--import", "tsx", "apps/api/src/server.ts"], {
+    env: {
+      ...process.env,
+      NODE_ENV: "development",
+      PORT: String(port),
+      DB_PATH: serverDb,
+      SESSION_SECRET: "ui-smoke-secret-not-for-production",
+      VISION_PROVIDER: "stub",
+      LLM_PROVIDER: "none",
+    },
+    stdio: ["ignore", "pipe", "pipe"],
+  });
+  server.stderr.on("data", (d) => {
+    const line = String(d).trim();
+    if (line) console.error("[server]", line);
+  });
+
+  const deadline = Date.now() + 30000;
+  for (;;) {
+    try {
+      const res = await fetch(`${base}/healthz`);
+      if (res.ok) break;
+    } catch {
+      /* not up yet */
+    }
+    if (Date.now() > deadline) throw new Error("server uji tidak siap dalam 30 detik");
+    await new Promise((r) => setTimeout(r, 400));
+  }
+  console.log(`(server uji: ${base}, provider stub)\n`);
+}
+
 const browser = await chromium.launch({ channel: "chrome", headless: true });
 const page = await browser.newPage({ viewport: { width: 420, height: 900 } });
 const consoleErrors = [];
@@ -71,7 +114,7 @@ page.on("console", (m) => {
 page.on("pageerror", (e) => consoleErrors.push("pageerror: " + e.message));
 
 try {
-  await page.goto(BASE, { waitUntil: "domcontentloaded" });
+  await page.goto(base, { waitUntil: "domcontentloaded" });
   await page.waitForSelector("#auth-card:not(.hidden)");
 
   step("halaman termuat", (await page.textContent("h1")).includes("Face"));
@@ -157,6 +200,10 @@ try {
   await page.screenshot({ path: "data/ui-failure.png", fullPage: true }).catch(() => {});
 } finally {
   await browser.close();
+  if (server) server.kill();
+  for (const f of [face, serverDb]) {
+    if (f) try { rmSync(f, { force: true }); } catch { /* sqlite may still hold it */ }
+  }
 }
 
 console.log(problems.length ? `\n${problems.length} MASALAH` : "\nSEMUA LULUS");
